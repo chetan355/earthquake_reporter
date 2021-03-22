@@ -1,6 +1,5 @@
 package com.example.quakedetector;
 
-import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,7 +19,7 @@ import java.util.Date;
 public class CustomAdapter extends ArrayAdapter<LiveReportRow>
 {
     private ArrayList<LiveReportRow> reportList;
-    public CustomAdapter(@NonNull Context context, ArrayList<LiveReportRow> list) {
+    public CustomAdapter(@NonNull MainActivity context, ArrayList<LiveReportRow> list) {
         super(context, 0,list);
         reportList = list;
     }
@@ -81,12 +80,12 @@ public class CustomAdapter extends ArrayAdapter<LiveReportRow>
 
         return listItemView;
     }
-    public int getMagnitudeColor(double mag)
-    {
+
+    public int getMagnitudeColor(double mag) {
+
         int magResourceId;
         int magnitude = (int) Math.floor(mag);
-        switch (magnitude)
-        {
+        switch (magnitude) {
             case 0:
             case 1:
                 magResourceId = R.color.magnitude1;
@@ -128,7 +127,7 @@ public class CustomAdapter extends ArrayAdapter<LiveReportRow>
     }
     public String formatDate(Date dateobj)
     {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("LLL , DD YYYY");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("LLL-dd-yyyy");
         return dateFormat.format(dateobj);
     }
     public String formatTime(Date dateobj)
