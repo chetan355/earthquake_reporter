@@ -67,7 +67,6 @@ public class MainActivity extends AppCompatActivity
         protected void onPostExecute(List<LiveReportRow> data)
         {
             adapter.clear();
-
             // If there is a valid list of {@link Earthquake}s, then add them to the adapter's
             // data set. This will trigger the ListView to update.
             if (data != null && !data.isEmpty()) {
