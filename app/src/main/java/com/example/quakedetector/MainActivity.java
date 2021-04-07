@@ -1,25 +1,26 @@
 package com.example.quakedetector;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.Loader;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<LiveReportRow>>
 {
-    private static final String SAMPLE_JSON_RESPONSE = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&orderby=time&minmag=6&limit=15";
+    private static final String SAMPLE_JSON_RESPONSE = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&orderby=time&minmag=2&limit=20";
+    private static final int EARTHQUAKE_LOADER_ID = 1;
     /** Tag for the log messages */
 //    private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
-    ArrayList<LiveReportRow> earthquakes;
+//    ArrayList<LiveReportRow> earthquakes;
     private CustomAdapter adapter;
     ListView earthquakeListView;
 
@@ -27,14 +28,12 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
         // Find a reference to the {@link ListView} in the layout
         // so the list can be populated in the user interface
-        earthquakeListView = (ListView) findViewById(R.id.list);
+        earthquakeListView = findViewById(R.id.list);
 
         // Create a new {@link ArrayAdapter} of earthquakes
-        adapter = new CustomAdapter(this,new ArrayList<LiveReportRow>());
+        adapter = new CustomAdapter(this,new ArrayList<>());
 
         // Set the adapter on the {@link ListView}
         earthquakeListView.setAdapter(adapter);
@@ -48,12 +47,38 @@ public class MainActivity extends AppCompatActivity
                 startActivity(webintent);
             }
         });
-        EarthQuakeAsynctask task = new EarthQuakeAsynctask();
-        task.execute(SAMPLE_JSON_RESPONSE);
+        // Initialize the loader. Pass in the int ID constant defined above and pass in null for
+        // the bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
+        // because this activity implements the LoaderCallbacks interface).
+        LoaderManager.getInstance(this).initLoader(EARTHQUAKE_LOADER_ID,null,this);
     }
-    //AsyncTask Implementation :
 
-    public class EarthQuakeAsynctask extends AsyncTask<String,Void, List<LiveReportRow>>
+
+    @NonNull
+    @Override
+    public Loader<List<LiveReportRow>> onCreateLoader(int id, Bundle args)
+    {
+        return new EarthquakeLoader(this,SAMPLE_JSON_RESPONSE);
+    }
+
+    @Override
+    public void onLoadFinished(@NonNull Loader<List<LiveReportRow>> loader, List<LiveReportRow> data) {
+        adapter.clear();
+        // If there is a valid list of {@link Earthquake}s, then add them to the adapter's
+        // data set. This will trigger the ListView to update.
+        if (data != null && !data.isEmpty()) {
+            adapter.addAll(data);
+        }
+
+    }
+
+    @Override
+    public void onLoaderReset(@NonNull Loader<List<LiveReportRow>> loader) {
+        adapter.clear();
+    }
+
+    //AsyncTask Implementation :
+/*    public class EarthQuakeAsynctask extends AsyncTask<String,Void, List<LiveReportRow>>
     {
         @Override
         protected List<LiveReportRow> doInBackground(String... urls) {
@@ -73,7 +98,7 @@ public class MainActivity extends AppCompatActivity
                 adapter.addAll(data);
             }
         }
-
     }
+  */
 
 }
