@@ -4,12 +4,20 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
+
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +25,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 {
     private static final String SAMPLE_JSON_RESPONSE = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&orderby=time&minmag=2&limit=20";
     private static final int EARTHQUAKE_LOADER_ID = 1;
+    private TextView mEmptyTextView;
+    private ProgressBar mProgressbar;
     /** Tag for the log messages */
 //    private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
@@ -32,6 +42,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         // so the list can be populated in the user interface
         earthquakeListView = findViewById(R.id.list);
 
+        mEmptyTextView = findViewById(R.id.empty_view);
+        earthquakeListView.setEmptyView(mEmptyTextView);
+
+        mProgressbar = findViewById(R.id.loading_spinner);
         // Create a new {@link ArrayAdapter} of earthquakes
         adapter = new CustomAdapter(this,new ArrayList<>());
 
@@ -47,22 +61,36 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 startActivity(webintent);
             }
         });
+
         // Initialize the loader. Pass in the int ID constant defined above and pass in null for
         // the bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
         // because this activity implements the LoaderCallbacks interface).
-        LoaderManager.getInstance(this).initLoader(EARTHQUAKE_LOADER_ID,null,this);
+
+        //Internet Connection Check :
+        ConnectivityManager cm =
+                (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                ((NetworkInfo) activeNetwork).isConnectedOrConnecting();
+        if(isConnected)
+            LoaderManager.getInstance(this).initLoader(EARTHQUAKE_LOADER_ID,null,this);
+        else{
+            mEmptyTextView.setText(R.string.no_internet);
+            mProgressbar.setVisibility(View.GONE);
+        }
     }
-
-
     @NonNull
     @Override
     public Loader<List<LiveReportRow>> onCreateLoader(int id, Bundle args)
     {
+        Log.e("LoaderMerits", "Inside the onCreateLoader");
         return new EarthquakeLoader(this,SAMPLE_JSON_RESPONSE);
     }
-
     @Override
     public void onLoadFinished(@NonNull Loader<List<LiveReportRow>> loader, List<LiveReportRow> data) {
+        mEmptyTextView.setText(R.string.no_earthquake);
+        mProgressbar.setVisibility(View.GONE);
+        Log.e("LoaderMerits", "Inside the onLoadFinished");
         adapter.clear();
         // If there is a valid list of {@link Earthquake}s, then add them to the adapter's
         // data set. This will trigger the ListView to update.
@@ -71,9 +99,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
 
     }
-
     @Override
-    public void onLoaderReset(@NonNull Loader<List<LiveReportRow>> loader) {
+    public void onLoaderReset(@NonNull Loader<List<LiveReportRow>> loader)
+    {
+        Log.e("LoaderMerits", "Inside the onLoaderReset");
         adapter.clear();
     }
 

@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Quake Reporter</string>
+    <string name = "no_earthquake">No earthquake found</string>
+    <string name = "no_internet">No Internet Connection</string>
+    <string name = "near_by">Near By</string>
+
 </resources>
