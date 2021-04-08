@@ -62,7 +62,7 @@ public class CustomAdapter extends ArrayAdapter<LiveReportRow>
         }
         else
         {
-            offset_loc.setText("Near by");
+            offset_loc.setText(R.string.near_by);
             main_loc.setText(location);
         }
 
