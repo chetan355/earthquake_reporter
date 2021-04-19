@@ -57,6 +57,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        LoaderManager.getInstance(this).initLoader(EARTHQUAKE_LOADER_ID,null,this);
+        Log.e("MainActivity", "onStart:");
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -107,13 +115,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public Loader<List<LiveReportRow>> onCreateLoader(int id, Bundle args)
     {
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String minMagnitude = sharedPrefs.getString(
-                getString(R.string.settings_min_magnitude_key),
-                getString(R.string.settings_min_magnitude_default));
-        String orderBy = sharedPrefs.getString(
-                getString(R.string.settings_order_by_key),
-                getString(R.string.settings_order_by_default)
-        );
+        String minMagnitude = sharedPrefs.getString(getString(R.string.settings_min_magnitude_key), getString(R.string.settings_min_magnitude_default));
+        String orderBy = sharedPrefs.getString(getString(R.string.settings_order_by_key),getString(R.string.settings_order_by_default));
 
         Uri baseUri = Uri.parse(SAMPLE_JSON_RESPONSE);
         Uri.Builder uriBuilder = baseUri.buildUpon();

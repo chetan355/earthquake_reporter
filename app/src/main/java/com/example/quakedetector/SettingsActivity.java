@@ -1,5 +1,4 @@
 package com.example.quakedetector;
-
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -9,6 +8,7 @@ import android.preference.PreferenceManager;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.loader.app.LoaderManager;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -22,8 +22,10 @@ public class SettingsActivity extends AppCompatActivity {
         public void onCreate(@Nullable Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.settings_main);
+
             Preference minMagnitude = findPreference(getString(R.string.settings_min_magnitude_key));
             bindPreferenceSummaryToValue(minMagnitude);
+
             Preference orderBy = findPreference(getString(R.string.settings_order_by_key));
             bindPreferenceSummaryToValue(orderBy);
         }
@@ -48,6 +50,5 @@ public class SettingsActivity extends AppCompatActivity {
             String preferenceString = preferences.getString(preference.getKey(), "");
             onPreferenceChange(preference, preferenceString);
         }
-
     }
 }
